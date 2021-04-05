@@ -7,4 +7,5 @@ pluginManagement {
         jcenter()
     }
 }
+
 include 'android', 'core'
