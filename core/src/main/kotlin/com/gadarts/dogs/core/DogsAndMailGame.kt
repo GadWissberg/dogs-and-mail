@@ -1,4 +1,4 @@
-package com.gadarts.dogs
+package com.gadarts.dogs.core
 
 import com.badlogic.gdx.Game
 

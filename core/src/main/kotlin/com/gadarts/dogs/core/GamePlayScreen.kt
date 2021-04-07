@@ -1,4 +1,4 @@
-package com.gadarts.dogs
+package com.gadarts.dogs.core
 
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Screen
