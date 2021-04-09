@@ -9,9 +9,4 @@ class DogsAndMailGame : Game() {
         setScreen(GamePlayScreen())
     }
 
-    override fun render() {
-    }
-
-    override fun dispose() {
-    }
 }

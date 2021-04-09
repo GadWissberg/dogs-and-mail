@@ -1,16 +1,17 @@
-package com.gadarts.dogs.systems
+package com.gadarts.dogs.core.systems
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.PerspectiveCamera
-import com.gadarts.dogs.systems.CameraSystem.Constants.FAR
-import com.gadarts.dogs.systems.CameraSystem.Constants.FOV
-import com.gadarts.dogs.systems.CameraSystem.Constants.NEAR
+import com.gadarts.dogs.core.systems.CameraSystem.Constants.FAR
+import com.gadarts.dogs.core.systems.CameraSystem.Constants.FOV
+import com.gadarts.dogs.core.systems.CameraSystem.Constants.NEAR
 
 
 class CameraSystem : EntitySystem() {
-    private lateinit var camera: PerspectiveCamera
+    lateinit var camera: PerspectiveCamera
+        private set
 
     object Constants {
         const val FOV = 67F
