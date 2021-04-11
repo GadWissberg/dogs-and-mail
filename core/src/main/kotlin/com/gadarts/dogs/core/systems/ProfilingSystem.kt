@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.utils.StringBuilder
-import com.gadarts.dogs.core.DefaultGameSettings.Settings
+import com.gadarts.dogs.core.DefaultSettings
 
 class ProfilingSystem : GameEntitySystem() {
     companion object {
@@ -48,7 +48,7 @@ class ProfilingSystem : GameEntitySystem() {
     }
 
     private fun setGlProfiler() {
-        if (Settings.SHOW_GL_PROFILING) {
+        if (DefaultSettings.SHOW_GL_PROFILING) {
             glProfiler.enable()
         }
     }

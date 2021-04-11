@@ -1,34 +1,28 @@
 package com.gadarts.dogs.core.systems
 
-import com.badlogic.ashley.core.*
+import com.badlogic.ashley.core.Engine
+import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Color.*
+import com.badlogic.gdx.graphics.Color.BLACK
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.PerspectiveCamera
-import com.badlogic.gdx.graphics.VertexAttributes.Usage.Normal
-import com.badlogic.gdx.graphics.VertexAttributes.Usage.Position
-import com.badlogic.gdx.graphics.g3d.*
+import com.badlogic.gdx.graphics.g3d.Environment
+import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.*
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.AmbientLight
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.math.Vector3
 import com.gadarts.dogs.core.ComponentsMapper
 import com.gadarts.dogs.core.ModelInstanceComponent
 import com.gadarts.dogs.core.systems.RenderSystem.C.AMBIENT_LIGHT
+import com.gadarts.dogs.core.systems.render.AxisModelHandler
 
 
 class RenderSystem : GameEntitySystem() {
-    private lateinit var axisModelInstanceX: ModelInstance
-    private lateinit var axisModelInstanceY: ModelInstance
-    private lateinit var axisModelInstanceZ: ModelInstance
-    private lateinit var axisModelX: Model
-    private lateinit var axisModelY: Model
-    private lateinit var axisModelZ: Model
-    private val auxVector3a: Vector3 = Vector3()
-    private val auxVector3b: Vector3 = Vector3()
+    private lateinit var axisModelHandler : AxisModelHandler
     private lateinit var env: Environment
     private lateinit var camera: PerspectiveCamera
     private lateinit var modelInstanceEntities: ImmutableArray<Entity>
@@ -49,43 +43,10 @@ class RenderSystem : GameEntitySystem() {
             camera = engine.getSystem(CameraSystem::class.java).camera
         }
         initializeEnv()
-        createAxis()
+        axisModelHandler = AxisModelHandler()
     }
 
-    private fun createAxis() {
-        val modelBuilder = ModelBuilder()
-        axisModelX = createAxisModel(modelBuilder, auxVector3b.set(1F, 0F, 0F), RED)
-        axisModelInstanceX = ModelInstance(axisModelX)
-        axisModelY = createAxisModel(modelBuilder, auxVector3b.set(0F, 1F, 0F), GREEN)
-        axisModelInstanceY = ModelInstance(axisModelY)
-        axisModelZ = createAxisModel(modelBuilder, auxVector3b.set(0F, 0F, 1F), BLUE)
-        axisModelInstanceZ = ModelInstance(axisModelZ)
-        transformAxisModel()
-    }
 
-    private fun transformAxisModel() {
-        scaleAxis()
-        axisModelInstanceX.transform.translate(0F, 0.1F, 0F)
-        axisModelInstanceY.transform.translate(0F, 0.1F, 0F)
-        axisModelInstanceZ.transform.translate(0F, 0.1F, 0F)
-    }
-
-    private fun scaleAxis() {
-        axisModelInstanceX.transform.scale(2F, 2F, 2F)
-        axisModelInstanceX.transform.translate(0F, 0.2F, 0F)
-        axisModelInstanceY.transform.scale(2F, 2F, 2F)
-        axisModelInstanceY.transform.translate(0F, 0.2F, 0F)
-        axisModelInstanceZ.transform.scale(2F, 2F, 2F)
-        axisModelInstanceZ.transform.translate(0F, 0.2F, 0F)
-    }
-
-    private fun createAxisModel(modelBuilder: ModelBuilder, dir: Vector3, color: Color): Model {
-        return modelBuilder.createArrow(
-                auxVector3a.setZero(),
-                dir,
-                Material(createDiffuse(color)),
-                (Position or Normal).toLong())
-    }
 
     private fun initializeEnv() {
         env = Environment()
@@ -101,9 +62,7 @@ class RenderSystem : GameEntitySystem() {
 
     private fun renderModels() {
         modelBatch.begin(camera)
-        modelBatch.render(axisModelInstanceX)
-        modelBatch.render(axisModelInstanceY)
-        modelBatch.render(axisModelInstanceZ)
+        axisModelHandler.render(modelBatch)
         for (entity in modelInstanceEntities) {
             modelBatch.render(ComponentsMapper.Map.modelInstance.get(entity).modelInstance, env)
         }
@@ -112,9 +71,7 @@ class RenderSystem : GameEntitySystem() {
 
     override fun dispose() {
         modelBatch.dispose()
-        axisModelX.dispose()
-        axisModelY.dispose()
-        axisModelZ.dispose()
+        axisModelHandler.dispose()
     }
 
     private fun resetDisplay(@Suppress("SameParameterValue") color: Color) {
