@@ -27,8 +27,8 @@ class RenderSystem : GameEntitySystem() {
     private lateinit var axisModelX: Model
     private lateinit var axisModelY: Model
     private lateinit var axisModelZ: Model
-    private val auxVector3_1: Vector3 = Vector3()
-    private val auxVector3_2: Vector3 = Vector3()
+    private val auxVector3a: Vector3 = Vector3()
+    private val auxVector3b: Vector3 = Vector3()
     private lateinit var env: Environment
     private lateinit var camera: PerspectiveCamera
     private lateinit var modelInstanceEntities: ImmutableArray<Entity>
@@ -54,11 +54,11 @@ class RenderSystem : GameEntitySystem() {
 
     private fun createAxis() {
         val modelBuilder = ModelBuilder()
-        axisModelX = createAxisModel(modelBuilder, auxVector3_2.set(1F, 0F, 0F), RED)
+        axisModelX = createAxisModel(modelBuilder, auxVector3b.set(1F, 0F, 0F), RED)
         axisModelInstanceX = ModelInstance(axisModelX)
-        axisModelY = createAxisModel(modelBuilder, auxVector3_2.set(0F, 1F, 0F), GREEN)
+        axisModelY = createAxisModel(modelBuilder, auxVector3b.set(0F, 1F, 0F), GREEN)
         axisModelInstanceY = ModelInstance(axisModelY)
-        axisModelZ = createAxisModel(modelBuilder, auxVector3_2.set(0F, 0F, 1F), BLUE)
+        axisModelZ = createAxisModel(modelBuilder, auxVector3b.set(0F, 0F, 1F), BLUE)
         axisModelInstanceZ = ModelInstance(axisModelZ)
         transformAxisModel()
     }
@@ -81,7 +81,7 @@ class RenderSystem : GameEntitySystem() {
 
     private fun createAxisModel(modelBuilder: ModelBuilder, dir: Vector3, color: Color): Model {
         return modelBuilder.createArrow(
-                auxVector3_1.setZero(),
+                auxVector3a.setZero(),
                 dir,
                 Material(createDiffuse(color)),
                 (Position or Normal).toLong())

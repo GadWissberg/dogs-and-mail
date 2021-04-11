@@ -6,10 +6,7 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.g3d.Model
 import com.badlogic.gdx.graphics.g3d.ModelInstance
-import com.gadarts.dogs.core.systems.GameEntitySystem
-import com.gadarts.dogs.core.systems.CameraSystem
-import com.gadarts.dogs.core.systems.InputSystem
-import com.gadarts.dogs.core.systems.RenderSystem
+import com.gadarts.dogs.core.systems.*
 
 class GamePlayScreen : Screen {
     private lateinit var assetsManager: AssetManager
@@ -25,10 +22,16 @@ class GamePlayScreen : Screen {
         assetsManager = AssetManager()
         assetsManager.load(C.MODEL_SCENE + C.FORMAT_MODEL, Model::class.java)
         assetsManager.finishLoading()
+        addSystems()
+        addScene()
+    }
+
+    private fun addSystems() {
         engine.addSystem(CameraSystem())
         engine.addSystem(RenderSystem())
         engine.addSystem(InputSystem())
-        addScene()
+        engine.addSystem(HudSystem())
+        engine.addSystem(ProfilingSystem())
     }
 
     private fun addScene() {
