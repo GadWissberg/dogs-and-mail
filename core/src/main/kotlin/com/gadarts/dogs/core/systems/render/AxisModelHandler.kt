@@ -10,14 +10,13 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Disposable
-import com.gadarts.dogs.core.systems.render.AxisModelHandler.Aux.auxVector3b
 
 class AxisModelHandler : Disposable {
     init {
         createAxis()
     }
 
-    object Aux {
+    companion object {
         internal val auxVector3a: Vector3 = Vector3()
         internal val auxVector3b: Vector3 = Vector3()
     }
@@ -53,7 +52,7 @@ class AxisModelHandler : Disposable {
 
     private fun createAxisModel(modelBuilder: ModelBuilder, dir: Vector3, color: Color): Model {
         return modelBuilder.createArrow(
-                Aux.auxVector3a.setZero(),
+                auxVector3a.setZero(),
                 dir,
                 Material(ColorAttribute.createDiffuse(color)),
                 (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal).toLong())
