@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.gadarts.dogs.core.systems
 
 import com.badlogic.ashley.core.Engine
@@ -14,6 +16,7 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.AmbientLight
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight
 import com.badlogic.gdx.math.Vector3
 import com.gadarts.dogs.core.ComponentsMapper
 import com.gadarts.dogs.core.ModelInstanceComponent
@@ -22,8 +25,9 @@ import com.gadarts.dogs.core.systems.render.AxisModelHandler
 
 
 class RenderSystem : GameEntitySystem() {
-    private lateinit var axisModelHandler : AxisModelHandler
+    private lateinit var axisModelHandler: AxisModelHandler
     private lateinit var env: Environment
+    private lateinit var shadowLight: DirectionalShadowLight
     private lateinit var camera: PerspectiveCamera
     private lateinit var modelInstanceEntities: ImmutableArray<Entity>
     private lateinit var modelBatch: ModelBatch
@@ -47,26 +51,50 @@ class RenderSystem : GameEntitySystem() {
     }
 
 
+    fun initializeModelShadowLight() {
+        shadowLight = DirectionalShadowLight(
+                1024,
+                1024,
+                Gdx.graphics.width.toFloat(),
+                Gdx.graphics.height.toFloat(),
+                1F,
+                300F
+        )
+        shadowLight[0.1f, 0.1f, 0.1f, 0f, -1f] = -0.5f
+        env.add(shadowLight)
+        env.shadowMap = shadowLight
+    }
 
     private fun initializeEnv() {
         env = Environment()
         env.set(ColorAttribute(AmbientLight, AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 1f))
         env.add(DirectionalLight().setDirection(C.sunLightDirection).setColor(C.sunLightColor))
+        initializeModelShadowLight()
     }
 
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
+        shadowLight.begin(shadowLight.camera)
+        renderModels(modelBatch, true)
+        shadowLight.end()
         resetDisplay(BLACK)
-        renderModels()
+        renderModels(modelBatch)
     }
 
-    private fun renderModels() {
-        modelBatch.begin(camera)
-        axisModelHandler.render(modelBatch)
+    private fun renderModels(batch: ModelBatch) {
+        renderModels(batch, false)
+    }
+
+    private fun renderModels(batch: ModelBatch, forShadows: Boolean) {
+        batch.begin(camera)
+        axisModelHandler.render(batch)
         for (entity in modelInstanceEntities) {
-            modelBatch.render(ComponentsMapper.Map.modelInstance.get(entity).modelInstance, env)
+            val modelInstanceComponent = ComponentsMapper.Map.modelInstance.get(entity)
+            if (!forShadows or modelInstanceComponent.hasShadow) {
+                batch.render(modelInstanceComponent.modelInstance, env)
+            }
         }
-        modelBatch.end()
+        batch.end()
     }
 
     override fun dispose() {
