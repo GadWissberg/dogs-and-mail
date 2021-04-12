@@ -25,7 +25,11 @@ class GamePlayScreen : Screen {
     companion object {
         const val FORMAT_MODEL = ".g3dj"
         const val MODEL_SCENE = "scene"
-        val auxVector = Vector3()
+        val auxVector1 = Vector3()
+        val auxVector2 = Vector3()
+        val auxVector3 = Vector3()
+        val auxVector4 = Vector3()
+        val auxVector5 = Vector3()
         val groundColor: Color = Color.valueOf("51A30A")
     }
 
@@ -55,11 +59,11 @@ class GamePlayScreen : Screen {
         val halfSize = 10F
 
         meshPartBuilder.rect(
-                auxVector.set(halfSize, 0.01F, halfSize),
-                auxVector.set(halfSize, 0.01F, -halfSize),
-                auxVector.set(-halfSize, 0.01F, -halfSize),
-                auxVector.set(-halfSize, 0.01F, halfSize),
-                auxVector.set(0F, 1F, 0F))
+                auxVector1.set(halfSize, 0.01F, halfSize),
+                auxVector2.set(halfSize, 0.01F, -halfSize),
+                auxVector3.set(-halfSize, 0.01F, -halfSize),
+                auxVector4.set(-halfSize, 0.01F, halfSize),
+                auxVector5.set(0F, 1F, 0F))
 
         groundModel = modelBuilder.end()
     }

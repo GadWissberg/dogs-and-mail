@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Color.BLACK
 import com.badlogic.gdx.graphics.GL20
@@ -17,6 +18,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.AmbientLight
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight
+import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider
 import com.badlogic.gdx.math.Vector3
 import com.gadarts.dogs.core.ComponentsMapper
 import com.gadarts.dogs.core.ModelInstanceComponent
@@ -25,6 +27,7 @@ import com.gadarts.dogs.core.systems.render.AxisModelHandler
 
 
 class RenderSystem : GameEntitySystem() {
+    private lateinit var shadowBatch: ModelBatch
     private lateinit var axisModelHandler: AxisModelHandler
     private lateinit var env: Environment
     private lateinit var shadowLight: DirectionalShadowLight
@@ -51,16 +54,13 @@ class RenderSystem : GameEntitySystem() {
     }
 
 
-    fun initializeModelShadowLight() {
-        shadowLight = DirectionalShadowLight(
-                1024,
-                1024,
-                Gdx.graphics.width.toFloat(),
-                Gdx.graphics.height.toFloat(),
-                1F,
-                300F
+    private fun initializeModelShadowLight() {
+        shadowBatch = ModelBatch(DepthShaderProvider())
+        shadowLight = DirectionalShadowLight(1024, 1024,
+                Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(),
+                1F, 300F
         )
-        shadowLight[0.1f, 0.1f, 0.1f, 0f, -1f] = -0.5f
+        shadowLight.set(0.1F, 0.1F, 0.1F, 0F, -1F, -0.5F)
         env.add(shadowLight)
         env.shadowMap = shadowLight
     }
@@ -75,17 +75,17 @@ class RenderSystem : GameEntitySystem() {
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
         shadowLight.begin(shadowLight.camera)
-        renderModels(modelBatch, true)
+        renderModels(shadowBatch, true, shadowLight.camera)
         shadowLight.end()
         resetDisplay(BLACK)
         renderModels(modelBatch)
     }
 
     private fun renderModels(batch: ModelBatch) {
-        renderModels(batch, false)
+        renderModels(batch, false, camera)
     }
 
-    private fun renderModels(batch: ModelBatch, forShadows: Boolean) {
+    private fun renderModels(batch: ModelBatch, forShadows: Boolean, camera: Camera) {
         batch.begin(camera)
         axisModelHandler.render(batch)
         for (entity in modelInstanceEntities) {
@@ -108,7 +108,7 @@ class RenderSystem : GameEntitySystem() {
         if (Gdx.graphics.bufferFormat.coverageSampling) {
             coveSampling = GL20.GL_COVERAGE_BUFFER_BIT_NV
         }
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT or coveSampling)
         Gdx.gl.glClearColor(color.r, color.g, color.b, 1f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT or coveSampling)
     }
 }
