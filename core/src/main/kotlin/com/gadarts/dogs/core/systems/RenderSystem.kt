@@ -56,11 +56,11 @@ class RenderSystem : GameEntitySystem() {
 
     private fun initializeModelShadowLight() {
         shadowBatch = ModelBatch(DepthShaderProvider())
-        shadowLight = DirectionalShadowLight(1024, 1024,
-                Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(),
-                1F, 300F
+        shadowLight = DirectionalShadowLight(2056, 2056,
+                16F, 16F,
+                0.1F, 300F
         )
-        shadowLight.set(0.1F, 0.1F, 0.1F, 0F, -1F, -0.5F)
+        shadowLight.set(.3F, .3F, .3F, -0.5F, -1F, -0.5F)
         env.add(shadowLight)
         env.shadowMap = shadowLight
     }
@@ -89,12 +89,20 @@ class RenderSystem : GameEntitySystem() {
         batch.begin(camera)
         axisModelHandler.render(batch)
         for (entity in modelInstanceEntities) {
-            val modelInstanceComponent = ComponentsMapper.Map.modelInstance.get(entity)
-            if (!forShadows or modelInstanceComponent.hasShadow) {
-                batch.render(modelInstanceComponent.modelInstance, env)
-            }
+            renderModel(entity, forShadows, batch)
         }
         batch.end()
+    }
+
+    private fun renderModel(entity: Entity?, forShadows: Boolean, batch: ModelBatch) {
+        val modelInstanceComponent = ComponentsMapper.Map.modelInstance.get(entity)
+        if (!forShadows or modelInstanceComponent.hasShadow) {
+            if (!forShadows) {
+                batch.render(modelInstanceComponent.modelInstance, env)
+            } else {
+                batch.render(modelInstanceComponent.modelInstance)
+            }
+        }
     }
 
     override fun dispose() {
