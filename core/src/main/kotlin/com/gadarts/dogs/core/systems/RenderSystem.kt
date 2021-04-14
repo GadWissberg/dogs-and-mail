@@ -17,8 +17,6 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.AmbientLight
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight
-import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider
 import com.badlogic.gdx.math.Vector3
 import com.gadarts.dogs.core.ComponentsMapper
 import com.gadarts.dogs.core.ModelInstanceComponent
@@ -27,10 +25,9 @@ import com.gadarts.dogs.core.systems.render.AxisModelHandler
 
 
 class RenderSystem : GameEntitySystem() {
-    private lateinit var shadowBatch: ModelBatch
     private lateinit var axisModelHandler: AxisModelHandler
     private lateinit var env: Environment
-    private lateinit var shadowLight: DirectionalShadowLight
+    private lateinit var shadowRenderer: ShadowRenderer
     private lateinit var camera: PerspectiveCamera
     private lateinit var modelInstanceEntities: ImmutableArray<Entity>
     private lateinit var modelBatch: ModelBatch
@@ -54,29 +51,20 @@ class RenderSystem : GameEntitySystem() {
     }
 
 
-    private fun initializeModelShadowLight() {
-        shadowBatch = ModelBatch(DepthShaderProvider())
-        shadowLight = DirectionalShadowLight(2056, 2056,
-                16F, 16F,
-                0.1F, 300F
-        )
-        shadowLight.set(.3F, .3F, .3F, -0.5F, -1F, -0.5F)
-        env.add(shadowLight)
-        env.shadowMap = shadowLight
-    }
 
     private fun initializeEnv() {
         env = Environment()
         env.set(ColorAttribute(AmbientLight, AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 1f))
         env.add(DirectionalLight().setDirection(C.sunLightDirection).setColor(C.sunLightColor))
-        initializeModelShadowLight()
+        shadowRenderer = ShadowRenderer()
+        shadowRenderer.init(env)
     }
 
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
-        shadowLight.begin(shadowLight.camera)
-        renderModels(shadowBatch, true, shadowLight.camera)
-        shadowLight.end()
+        shadowRenderer.begin()
+        renderModels(shadowRenderer.shadowBatch, true, shadowRenderer.shadowLight.camera)
+        shadowRenderer.end()
         resetDisplay(BLACK)
         renderModels(modelBatch)
     }

@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Component
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.utils.Pool
 
-class ModelInstanceComponent() : Component, Pool.Poolable {
+class ModelInstanceComponent : Component, Pool.Poolable {
     var modelInstance: ModelInstance? = null
         private set
     var hasShadow: Boolean = false
