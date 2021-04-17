@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.g3d.Model
 import com.badlogic.gdx.graphics.g3d.ModelInstance
+import com.badlogic.gdx.math.Vector2
 import com.gadarts.dogs.core.systems.*
 
 
@@ -26,6 +27,7 @@ class GamePlayScreen : Screen {
                         "01010111" +
                         "01111100" +
                         "00010000"
+        val PAVEMENT_GRID_ORIGIN: Vector2 = Vector2(-2F, -1F)
     }
 
     override fun show() {
@@ -43,8 +45,7 @@ class GamePlayScreen : Screen {
         val pavementModel = assetsManager.getModel(MODEL_PAVEMENT)
         graph = Array(GRAPH_HEIGHT) { row ->
             Array(GRAPH_WIDTH) { col ->
-                Gdx.app.log("", "" + (row * GRAPH_WIDTH + col))
-                val value = TEST_LEVEL[row * GRAPH_WIDTH + col].toInt()
+                val value = Character.getNumericValue(TEST_LEVEL[row * GRAPH_WIDTH + col].toInt())
                 var pavement: Entity? = null
                 if (value > 0) {
                     pavement = addPavementEntity(pavementModel, row, col)
@@ -57,12 +58,21 @@ class GamePlayScreen : Screen {
     private fun addPavementEntity(pavementModel: Model?, row: Int, col: Int): Entity? {
         val pavement = engine.createEntity()
         pavement.add(engine.createComponent(PavementComponent::class.java))
-        val modelInsComp = engine.createComponent(ModelInstanceComponent::class.java)
-        modelInsComp.init(ModelInstance(pavementModel))
-        modelInsComp.modelInstance!!.transform.translate(col.toFloat(), 0F, row.toFloat())
-        pavement.add(modelInsComp)
+        addModelInstanceComponentToPavement(pavementModel, col, row, pavement)
         engine.addEntity(pavement)
         return pavement
+    }
+
+    private fun addModelInstanceComponentToPavement(pavementModel: Model?,
+                                                    col: Int,
+                                                    row: Int,
+                                                    pavement: Entity) {
+        val modelInsComp = engine.createComponent(ModelInstanceComponent::class.java)
+        modelInsComp.init(ModelInstance(pavementModel))
+        val transform = modelInsComp.modelInstance!!.transform
+        transform.setTranslation(PAVEMENT_GRID_ORIGIN.x, 0F, PAVEMENT_GRID_ORIGIN.y)
+        transform.translate(col.toFloat(), 0F, row.toFloat())
+        pavement.add(modelInsComp)
     }
 
     private fun addSystems() {
