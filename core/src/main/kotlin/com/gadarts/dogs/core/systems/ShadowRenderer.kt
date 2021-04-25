@@ -13,7 +13,7 @@ class ShadowRenderer {
     internal fun init(env: Environment) {
         shadowBatch = ModelBatch(DepthShaderProvider())
         shadowLight = DirectionalShadowLight(2056, 2056,
-                16F, 16F,
+                32F, 32F,
                 0.1F, 300F
         )
         shadowLight.set(.3F, .3F, .3F, -0.5F, -1F, -0.5F)
