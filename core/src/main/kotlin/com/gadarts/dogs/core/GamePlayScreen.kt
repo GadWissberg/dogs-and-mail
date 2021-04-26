@@ -3,7 +3,6 @@ package com.gadarts.dogs.core
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.PooledEngine
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.g3d.Model
 import com.badlogic.gdx.graphics.g3d.ModelInstance
@@ -48,31 +47,21 @@ class GamePlayScreen : Screen {
                 val value = Character.getNumericValue(TEST_LEVEL[row * GRAPH_WIDTH + col].toInt())
                 var pavement: Entity? = null
                 if (value > 0) {
-                    pavement = addPavementEntity(pavementModel, row, col)
+                    pavement = addPavementEntity(pavementModel!!, row, col)
                 }
                 GraphNode(pavement, row, col)
             }
         }
     }
 
-    private fun addPavementEntity(pavementModel: Model?, row: Int, col: Int): Entity? {
+    private fun addPavementEntity(pavementModel: Model, row: Int, col: Int): Entity? {
+        EntityBuilder.begin(engine)
+                .addPavementComponent()
+                .addModelInstanceComponent(pavementModel, col, row, PAVEMENT_GRID_ORIGIN)
+                .finish()
         val pavement = engine.createEntity()
-        pavement.add(engine.createComponent(PavementComponent::class.java))
-        addModelInstanceComponentToPavement(pavementModel, col, row, pavement)
         engine.addEntity(pavement)
         return pavement
-    }
-
-    private fun addModelInstanceComponentToPavement(pavementModel: Model?,
-                                                    col: Int,
-                                                    row: Int,
-                                                    pavement: Entity) {
-        val modelInsComp = engine.createComponent(ModelInstanceComponent::class.java)
-        modelInsComp.init(ModelInstance(pavementModel))
-        val transform = modelInsComp.modelInstance!!.transform
-        transform.setTranslation(PAVEMENT_GRID_ORIGIN.x, 0F, PAVEMENT_GRID_ORIGIN.y)
-        transform.translate(col.toFloat(), 0F, row.toFloat())
-        pavement.add(modelInsComp)
     }
 
     private fun addSystems() {
