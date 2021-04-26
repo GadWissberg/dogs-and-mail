@@ -23,11 +23,11 @@ class GamePlayScreen : Screen {
         const val GRAPH_HEIGHT = 5
         const val TEST_LEVEL =
                 "00101111" +
-                        "11111101" +
-                        "01010111" +
+                        "01111101" +
+                        "11010111" +
                         "01111100" +
-                        "00010000"
-        val PAVEMENT_GRID_ORIGIN: Vector2 = Vector2(-2F, -1F)
+                        "00100000"
+        val PAVEMENT_GRID_ORIGIN: Vector2 = Vector2(-2.5F, -1F)
     }
 
     override fun show() {
